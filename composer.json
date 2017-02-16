@@ -1,0 +1,34 @@
+{
+    "name": "milhojas/eventsourcing",
+    "description": "A simple library to start with eventsourcing",
+    "type": "library",
+    "require": {
+        "php": "^5.5 || ^7.0",
+
+        "milhojas/messaging": "^1.1"
+    },
+    "require-dev": {
+        "phpspec/phpspec": "^3.2",
+        "phpunit/phpunit": "^5.7"
+    },
+    "config": {
+        "bin-dir": "bin/"
+    },
+    "autoload": {
+        "psr-4": {
+            "Milhojas\\Messaging\\": ["src/Milhojas/Messaging"]
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Test\\Messaging\\": ["test/Milhojas/Messaging"]
+        }
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "franiglesias",
+            "email": "franiglesias@mac.com"
+        }
+    ]
+}
