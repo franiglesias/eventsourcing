@@ -1,10 +1,10 @@
 <?php
 
-namespace Tests\Library\EventSourcing;
+namespace Test\EventSourcing;
 
-use Milhojas\Library\EventSourcing\EventStream\EventMessage;
+use Milhojas\EventSourcing\EventStream\EventMessage;
 use Milhojas\Messaging\EventBus\Event;
-use Milhojas\Library\EventSourcing\DTO\EntityDTO;
+use Milhojas\EventSourcing\DTO\EntityDTO;
 
 /**
  * Description.

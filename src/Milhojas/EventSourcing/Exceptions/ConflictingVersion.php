@@ -1,6 +1,6 @@
 <?php
 
-namespace Milhojas\Library\EventSourcing\Exceptions;
+namespace Milhojas\EventSourcing\Exceptions;
 
 class ConflictingVersion extends \UnexpectedValueException {}
 

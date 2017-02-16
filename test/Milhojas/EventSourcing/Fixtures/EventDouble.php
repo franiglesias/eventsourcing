@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Library\EventSourcing\Fixtures;
+namespace Test\EventSourcing\Fixtures;
 
 use Milhojas\Messaging\EventBus\Event;
 

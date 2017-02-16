@@ -1,11 +1,11 @@
 <?php
 
-namespace Tests\Library\EventSourcing\Fixtures;
+namespace Test\EventSourcing\Fixtures;
 
 use Milhojas\Messaging\EventBus\Event;
 use Milhojas\Library\ValueObjects\Identity\Id;
 
-use Milhojas\Library\EventSourcing\Domain\EventSourcedEntity;
+use Milhojas\EventSourcing\Domain\EventSourcedEntity;
 
 class EventSourcedEntityDummy extends EventSourcedEntity {
 	

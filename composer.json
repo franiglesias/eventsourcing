@@ -5,23 +5,26 @@
     "require": {
         "php": "^5.5 || ^7.0",
 
-        "milhojas/messaging": "^1.1"
+        "milhojas/messaging": "^1.1",
+        "ramsey/uuid": "^3.5",
+        "doctrine/orm": "^2.5"
     },
     "require-dev": {
         "phpspec/phpspec": "^3.2",
-        "phpunit/phpunit": "^5.7"
+        "phpunit/phpunit": "^5.7",
+        "doctrine/data-fixtures": "^1.2"
     },
     "config": {
         "bin-dir": "bin/"
     },
     "autoload": {
         "psr-4": {
-            "Milhojas\\Messaging\\": ["src/Milhojas/Messaging"]
+            "Milhojas\\EventSourcing\\": ["src/Milhojas/EventSourcing"]
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Test\\Messaging\\": ["test/Milhojas/Messaging"]
+            "Test\\EventSourcing\\": ["test/Milhojas/EventSourcing"]
         }
     },
     "license": "MIT",

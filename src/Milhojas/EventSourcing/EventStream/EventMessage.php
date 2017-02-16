@@ -1,10 +1,10 @@
 <?php
 
-namespace Milhojas\Library\EventSourcing\EventStream;
+namespace Milhojas\EventSourcing\EventStream;
 
 use Milhojas\Messaging\EventBus\Event;
-use Milhojas\Library\EventSourcing\DTO\EntityDTO;
-use Milhojas\Library\EventSourcing\DTO\EventDTO;
+use Milhojas\EventSourcing\DTO\EntityDTO;
+use Milhojas\EventSourcing\DTO\EventDTO;
 
 /**
 * Stores an event and metadata needed

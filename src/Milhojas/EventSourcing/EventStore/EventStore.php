@@ -1,10 +1,10 @@
 <?php
 
-namespace Milhojas\Library\EventSourcing\EventStore;
+namespace Milhojas\EventSourcing\EventStore;
 
-use Milhojas\Library\EventSourcing\EventStream\EventStream;
-use Milhojas\Library\EventSourcing\DTO\EntityDTO;
-use Milhojas\Library\EventSourcing\Exceptions as Exception;
+use Milhojas\EventSourcing\EventStream\EventStream;
+use Milhojas\EventSourcing\DTO\EntityDTO;
+use Milhojas\EventSourcing\Exceptions as Exception;
 
 /**
  * An event store stores event streams and allow us to recover the full stream for an entity.

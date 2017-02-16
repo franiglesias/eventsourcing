@@ -1,6 +1,6 @@
 <?php
 
-namespace Milhojas\Library\EventSourcing\Domain;
+namespace Milhojas\EventSourcing\Domain;
 
 /**
  * An entity that can be Event Sourced

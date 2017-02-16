@@ -1,11 +1,11 @@
 <?php
 
-namespace Milhojas\Library\EventSourcing\Domain;
+namespace Milhojas\EventSourcing\Domain;
 
 use Milhojas\Messaging\EventBus\Event;
-use Milhojas\Library\EventSourcing\DTO\EntityDTO;
-use Milhojas\Library\EventSourcing\EventStream\EventStream;
-use Milhojas\Library\EventSourcing\EventStream\EventMessage;
+use Milhojas\EventSourcing\DTO\EntityDTO;
+use Milhojas\EventSourcing\EventStream\EventStream;
+use Milhojas\EventSourcing\EventStream\EventMessage;
 
 /**
  * Base class for Event Sourced Domain Entities.

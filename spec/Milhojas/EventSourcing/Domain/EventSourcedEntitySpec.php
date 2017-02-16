@@ -1,28 +1,26 @@
 <?php
 
-namespace spec\Milhojas\Library\EventSourcing\Domain;
+namespace spec\Milhojas\EventSourcing\Domain;
 
-use Milhojas\Library\EventSourcing\Domain\EventSourcedEntity;
+use Milhojas\EventSourcing\Domain\EventSourcedEntity;
 use Milhojas\Messaging\EventBus\Event;
 use PhpSpec\ObjectBehavior;
-use Milhojas\Library\ValueObjects\Identity\Id;
 
 class EventSourcedEntitySpec extends ObjectBehavior
 {
-    public function let(Id $id)
+    public function let()
     {
-        $id->getId()->willReturn('entity-id');
         $this->beAnInstanceOf(ESTest::class);
-        $this->setId($id);
+        $this->setId('entity-id');
     }
     public function it_is_initializable()
     {
         $this->shouldHaveType(EventSourcedEntity::class);
     }
 
-    public function it_returns_entity_id($id)
+    public function it_returns_entity_id()
     {
-        $this->getId()->shouldBe($id);
+        $this->getId()->shouldBe('entity-id');
     }
 
     public function it_has_version_zero_if_newly_created()
@@ -91,7 +89,7 @@ class ESTest extends EventSourcedEntity
     {
     }
 
-    public function setId(Id $id)
+    public function setId($id)
     {
         $this->id = $id;
     }
