@@ -28,6 +28,16 @@ class DoctrineEventStore extends EventStore
         return $stream;
     }
 
+    public function saveStream(EventStream $stream)
+    {
+        foreach ($stream as $message) {
+            $this->checkVersion($message->getEntity());
+            $this->em->persist(EventDTO::fromEventMessage($message));
+        }
+        $this->em->flush();
+        $this->em->clear();
+    }
+
     private function getStoredData(EntityDTO $entity)
     {
         $dtos = $this->em
@@ -48,6 +58,7 @@ class DoctrineEventStore extends EventStore
         if ($entity->getVersion()) {
             $query .= ' AND events.version <= :version';
         }
+        $query .= ' ORDER BY events.entity_type, events.entity_id, events.version';
 
         return $query;
     }
@@ -63,16 +74,6 @@ class DoctrineEventStore extends EventStore
         }
 
         return $params;
-    }
-
-    public function saveStream(EventStream $stream)
-    {
-        foreach ($stream as $message) {
-            $this->checkVersion($message->getEntity());
-            $this->em->persist(EventDTO::fromEventMessage($message));
-        }
-        $this->em->flush();
-        $this->em->clear();
     }
 
     public function countEntitiesOfType($type)

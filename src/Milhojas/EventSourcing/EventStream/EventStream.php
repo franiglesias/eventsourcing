@@ -63,7 +63,7 @@ class EventStream implements \IteratorAggregate
         $buffer[] = sprintf('Stream has %s messages', count($this->messages));
         $counter = 0;
         foreach ($this->messages as $message) {
-            $buffer[] = sprintf('[%s] %s', $counter, $message);
+            $buffer[] = sprintf('[%s] %s v.%s', $counter, $message, $message->getEntity()->getVersion());
             ++$counter;
         }
 

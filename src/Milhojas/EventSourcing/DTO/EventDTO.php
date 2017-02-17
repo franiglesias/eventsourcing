@@ -11,7 +11,9 @@ use Milhojas\EventSourcing\EventStream\EventMessage;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="events")
+ * @ORM\Table(name="events",indexes={
+ *   @ORM\Index(name="entity_index", columns={"entity_type","entity_id","version"})
+ * })
  */
 class EventDTO
 {

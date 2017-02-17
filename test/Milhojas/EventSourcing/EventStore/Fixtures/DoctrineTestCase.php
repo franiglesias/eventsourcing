@@ -33,6 +33,17 @@ class DoctrineTestCase extends \PHPUnit_Framework_TestCase
 
         $this->em = $this->getEntityManager();
     }
+
+    public function xxxtearDown()
+    {
+        $schemaTool = new SchemaTool(static::getEntityManager());
+
+        $metadatas = static::getEntityManager()
+                    ->getMetadataFactory()
+                    ->getAllMetadata();
+
+        $schemaTool->dropSchema($metadatas);
+    }
     /**
      * Executes fixtures.
      *
@@ -77,7 +88,6 @@ class DoctrineTestCase extends \PHPUnit_Framework_TestCase
 
         $config = Setup::createConfiguration($isDevMode);
         $config->addEntityNamespace('EventStore', 'Milhojas\\EventSourcing\\DTO');
-
         $driver = new AnnotationDriver(new AnnotationReader(), $paths);
 
         AnnotationRegistry::registerLoader('class_exists');

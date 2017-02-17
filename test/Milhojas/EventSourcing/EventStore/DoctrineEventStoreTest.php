@@ -19,6 +19,7 @@ class DoctrineEventStoreTest extends DoctrineTestCase
     {
         parent::setup();
         $this->loadFixturesFromDirectory(__DIR__.'/Fixtures');
+        $this->em->clear();
     }
 
     public function test_it_loads_stream_with_3_events()
@@ -75,15 +76,6 @@ class DoctrineEventStoreTest extends DoctrineTestCase
         $this->assertEquals(5, $storage->count(new EntityDTO('Entity', 3, 0)));
     }
 
-    public function test_it_can_save_a_stream_and_load_it_and_remains_equal()
-    {
-        $storage = new DoctrineEventStore($this->em);
-        $stream = $this->prepareEventStream('Entity', 3, 5);
-        $storage->saveStream($stream);
-        $loaded = $storage->loadStream(new EntityDTO('Entity', 3));
-        $this->assertEquals($stream, $loaded);
-    }
-
     public function test_it_can_save_a_new_stream()
     {
         $storage = new DoctrineEventStore($this->em);
@@ -103,6 +95,16 @@ class DoctrineEventStoreTest extends DoctrineTestCase
         $storage->saveStream($stream);
     }
 
+    public function test_it_can_save_a_stream_and_load_it_and_remains_equal()
+    {
+        $storage = new DoctrineEventStore($this->em);
+        $stream = $this->prepareEventStream('Entity', 3, 20);
+        $storage->saveStream($stream);
+        $this->em->clear();
+        $loaded = $storage->loadStream(new EntityDTO('Entity', 3));
+        $this->em->clear();
+        $this->assertEquals($stream, $loaded);
+    }
     private function prepareEventStream($entity, $id, $maxVersion)
     {
         $stream = new EventStream();
