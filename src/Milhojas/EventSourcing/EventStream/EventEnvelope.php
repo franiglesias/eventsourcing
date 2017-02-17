@@ -25,7 +25,7 @@ class EventEnvelope
     {
         return new static(
             self::autoAssignIdentity(),
-            new \DateTimeImmutable(),
+            new \DateTime(),
             array()
         );
     }

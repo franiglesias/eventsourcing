@@ -100,9 +100,7 @@ class DoctrineEventStoreTest extends DoctrineTestCase
         $storage = new DoctrineEventStore($this->em);
         $stream = $this->prepareEventStream('Entity', 3, 20);
         $storage->saveStream($stream);
-        $this->em->clear();
         $loaded = $storage->loadStream(new EntityDTO('Entity', 3));
-        $this->em->clear();
         $this->assertEquals($stream, $loaded);
     }
     private function prepareEventStream($entity, $id, $maxVersion)

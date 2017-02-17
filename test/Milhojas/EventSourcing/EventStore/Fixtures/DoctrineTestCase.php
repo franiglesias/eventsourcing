@@ -9,6 +9,7 @@ use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Loader;
+use Doctrine\DBAL\Configuration;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Tools\Setup;
@@ -34,7 +35,7 @@ class DoctrineTestCase extends \PHPUnit_Framework_TestCase
         $this->em = $this->getEntityManager();
     }
 
-    public function xxxtearDown()
+    public function tearDown()
     {
         $schemaTool = new SchemaTool(static::getEntityManager());
 
