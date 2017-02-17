@@ -67,6 +67,6 @@ class EventStream implements \IteratorAggregate
             ++$counter;
         }
 
-        return implode(chr(10), $buffer);
+        return PHP_EOL.implode(PHP_EOL, $buffer).PHP_EOL;
     }
 }
