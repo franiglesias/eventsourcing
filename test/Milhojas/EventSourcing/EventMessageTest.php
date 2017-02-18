@@ -4,7 +4,7 @@ namespace Test\EventSourcing;
 
 use Milhojas\EventSourcing\EventStream\EventMessage;
 use Milhojas\Messaging\EventBus\Event;
-use Milhojas\EventSourcing\DTO\EntityDTO;
+use Milhojas\EventSourcing\EventStream\Entity;
 
 /**
  * Description.
@@ -14,7 +14,7 @@ class EventMessageTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->event = $this->prophesize(Event::class);
-        $this->entity = $this->prophesize(EntityDTO::class);
+        $this->entity = $this->prophesize(Entity::class);
         $this->message = EventMessage::record($this->event->reveal(), $this->entity->reveal());
     }
 

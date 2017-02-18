@@ -3,7 +3,7 @@
 namespace Milhojas\EventSourcing\Domain;
 
 use Milhojas\Messaging\EventBus\Event;
-use Milhojas\EventSourcing\DTO\EntityDTO;
+use Milhojas\EventSourcing\EventStream\Entity;
 use Milhojas\EventSourcing\EventStream\EventStream;
 use Milhojas\EventSourcing\EventStream\EventMessage;
 
@@ -91,7 +91,7 @@ abstract class EventSourcedEntity implements EventSourced
         }
         $this->apply($event);
         $this->initStream();
-        $this->stream->recordThat(EventMessage::record($event, EntityDTO::fromEntity($this)));
+        $this->stream->recordThat(EventMessage::record($event, Entity::fromEntity($this)));
     }
 
     /**

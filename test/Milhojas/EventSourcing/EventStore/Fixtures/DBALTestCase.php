@@ -4,9 +4,6 @@ namespace Test\EventSourcing\EventStore\Fixtures;
 
 // https://vincent.composieux.fr/article/test-your-doctrine-repository-using-a-sqlite-database
 
-use Doctrine\Common\DataFixtures\Purger\ORMPurger;
-use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
-use Doctrine\Common\DataFixtures\Loader;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Schema\Schema;
@@ -35,29 +32,6 @@ class DBALTestCase extends \PHPUnit_Framework_TestCase
     public function tearDown()
     {
         $this->destroyDatabase();
-    }
-    /**
-     * Executes fixtures.
-     *
-     * @param \Doctrine\Common\DataFixtures\Loader $loader
-     */
-    protected function executeFixtures(Loader $loader)
-    {
-        $purger = new ORMPurger();
-        $executor = new ORMExecutor($this->em, $purger);
-        $executor->execute($loader->getFixtures());
-    }
-
-    /**
-     * Load and execute fixtures from a directory.
-     *
-     * @param string $directory
-     */
-    protected function loadFixturesFromDirectory($directory)
-    {
-        $loader = new Loader();
-        $loader->loadFromDirectory($directory);
-        $this->executeFixtures($loader);
     }
 
     public function createDatabase()

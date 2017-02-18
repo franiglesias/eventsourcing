@@ -5,7 +5,7 @@ namespace Milhojas\EventSourcing\EventStore;
 use Doctrine\DBAL\Connection;
 use Milhojas\EventSourcing\EventStream\EventStream;
 use Milhojas\EventSourcing\EventStream\EventMessage;
-use Milhojas\EventSourcing\DTO\EntityDTO;
+use Milhojas\EventSourcing\EventStream\Entity;
 use Milhojas\EventSourcing\Exceptions as Exception;
 
 class DBALEventStore extends EventStore
@@ -17,7 +17,7 @@ class DBALEventStore extends EventStore
         $this->connection = $connection;
     }
 
-    public function loadStream(EntityDTO $entity)
+    public function loadStream(Entity $entity)
     {
         $this->connection->beginTransaction();
         try {
@@ -64,7 +64,7 @@ class DBALEventStore extends EventStore
         $stmt->execute();
     }
 
-    private function getStoredData(EntityDTO $entity)
+    private function getStoredData(Entity $entity)
     {
         $sql = $this->buildDQL($entity);
         $stmt = $this->connection->prepare($sql);
@@ -83,7 +83,7 @@ class DBALEventStore extends EventStore
         return $dtos;
     }
 
-    private function buildDQL(EntityDTO $entity)
+    private function buildDQL(Entity $entity)
     {
         $query = 'SELECT * FROM events WHERE events.entity_type = :entity_type AND events.entity_id = :entity_id';
         if ($entity->getVersion()) {
@@ -108,7 +108,7 @@ class DBALEventStore extends EventStore
         return (int) $result;
     }
 
-    public function count(EntityDTO $entity)
+    public function count(Entity $entity)
     {
         $builder = $this->connection->createQueryBuilder();
         $builder
@@ -123,7 +123,7 @@ class DBALEventStore extends EventStore
         return (int) $result;
     }
 
-    protected function getStoredVersion(EntityDTO $entity)
+    protected function getStoredVersion(Entity $entity)
     {
         $builder = $this->connection->createQueryBuilder();
         $builder

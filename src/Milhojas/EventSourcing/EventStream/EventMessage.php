@@ -3,8 +3,6 @@
 namespace Milhojas\EventSourcing\EventStream;
 
 use Milhojas\Messaging\EventBus\Event;
-use Milhojas\EventSourcing\DTO\EntityDTO;
-use Milhojas\EventSourcing\DTO\EventDTO;
 
 /**
  * Stores an event and metadata needed.
@@ -15,14 +13,14 @@ class EventMessage
     private $envelope;
     private $entity;
 
-    public function __construct(Event $event, EntityDTO $entity, EventEnvelope $envelope)
+    public function __construct(Event $event, Entity $entity, EventEnvelope $envelope)
     {
         $this->event = $event;
         $this->entity = $entity;
         $this->envelope = $envelope;
     }
 
-    public static function record(Event $event, EntityDTO $entity)
+    public static function record(Event $event, Entity $entity)
     {
         return new static(
             $event,
@@ -31,20 +29,11 @@ class EventMessage
         );
     }
 
-    public static function fromEventDTO(EventDTO $dto)
-    {
-        return new static(
-            $dto->getEvent(),
-            EntityDTO::fromEventDTO($dto),
-            EventEnvelope::fromEventDTO($dto)
-        );
-    }
-
     public static function fromDtoArray(array $dto)
     {
         return new static(
             unserialize($dto['event']),
-            new EntityDTO($dto['entity_type'], $dto['entity_id'], $dto['version']),
+            new Entity($dto['entity_type'], $dto['entity_id'], $dto['version']),
             new EventEnvelope(
                 $dto['id'],
                 new \DateTime($dto['timestamp']),

@@ -3,7 +3,7 @@
 namespace Milhojas\EventSourcing\EventStore;
 
 use Milhojas\EventSourcing\EventStream\EventStream;
-use Milhojas\EventSourcing\DTO\EntityDTO;
+use Milhojas\EventSourcing\EventStream\Entity;
 use Milhojas\EventSourcing\Exceptions as Exception;
 
 /**
@@ -16,11 +16,11 @@ abstract class EventStore{
 	/**
 	 * Load an stream of events, representing the history of an aggregate
 	 *
-	 * @param EntityDTO $entity 
+	 * @param Entity $entity 
 	 * @return EventStream
 	 * @author Francisco Iglesias Gómez
 	 */
-	abstract public function loadStream(EntityDTO $entity);
+	abstract public function loadStream(Entity $entity);
 	
 	
 	/**
@@ -35,19 +35,19 @@ abstract class EventStore{
 	/**
 	 * Counts the number of events stored for the Entity
 	 *
-	 * @param EntityDTO $entity 
+	 * @param Entity $entity 
 	 * @return integer
 	 */
-	abstract public function count(EntityDTO $entity);
+	abstract public function count(Entity $entity);
 
 	/**
 	 * Compares aggregate's current version with the stored version. If thery are out os sync throws exception
 	 *
-	 * @param EntityDTO $entity 
+	 * @param Entity $entity 
 	 * @return nothing or ConflictingVersion Exception
 	 * @author Francisco Iglesias Gómez
 	 */
-	protected function checkVersion(EntityDTO $entity)
+	protected function checkVersion(Entity $entity)
 	{
 		$newVersion = $entity->getVersion();
 		$storedVersion = $this->getStoredVersion($entity);
@@ -59,10 +59,10 @@ abstract class EventStore{
 	/**
 	 * Computes or obtains the max version number of the aggregate stored in the Event Store 
 	 *
-	 * @param EntityDTO $entity Tramsports data for entity
+	 * @param Entity $entity Tramsports data for entity
 	 * @return integer
 	 */
-	abstract protected function getStoredVersion(EntityDTO $entity);
+	abstract protected function getStoredVersion(Entity $entity);
 }
 
 ?>
