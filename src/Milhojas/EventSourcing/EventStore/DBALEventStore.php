@@ -7,7 +7,6 @@ use Milhojas\EventSourcing\EventStream\EventStream;
 use Milhojas\EventSourcing\EventStream\EventMessage;
 use Milhojas\EventSourcing\DTO\EntityDTO;
 use Milhojas\EventSourcing\Exceptions as Exception;
-use Milhojas\EventSourcing\EventStream\EventEnvelope;
 
 class DBALEventStore extends EventStore
 {
@@ -24,16 +23,7 @@ class DBALEventStore extends EventStore
         try {
             $stream = new EventStream();
             foreach ($this->getStoredData($entity) as $dto) {
-                $message = new EventMessage(
-                    unserialize($dto['event']),
-                    new EntityDTO($dto['entity_type'], $dto['entity_id'], $dto['version']),
-                    new EventEnvelope(
-                        $dto['id'],
-                        new \DateTime($dto['timestamp']),
-                        unserialize($dto['metadata'])
-                        )
-                );
-                $stream->recordThat($message);
+                $stream->recordThat(EventMessage::fromDtoArray($dto));
             }
             $this->connection->commit();
 
@@ -104,28 +94,14 @@ class DBALEventStore extends EventStore
         return $query;
     }
 
-    private function buildParameters(EntityDTO $entity)
-    {
-        $params = array(
-            'entity' => $entity->getType(),
-            'id' => $entity->getPlainId(),
-        );
-        if ($entity->getVersion()) {
-            $params['version'] = $entity->getVersion();
-        }
-
-        return $params;
-    }
-
     public function countEntitiesOfType($type)
     {
         $builder = $this->connection->createQueryBuilder();
         $builder
-        ->select('COUNT(events.id) AS entities')
-        ->from('events')
-        ->where('events.entity_type = :entity')
-        ->andWhere('events.version = 1')
-        ->setParameter('entity', $type)
+            ->select('COUNT(events.id) AS entities')
+            ->from('events')
+            ->where('events.entity_type = :entity')->andWhere('events.version = 1')
+            ->setParameter('entity', $type)
         ;
         $result = $builder->execute()->fetchColumn();
 
@@ -136,12 +112,11 @@ class DBALEventStore extends EventStore
     {
         $builder = $this->connection->createQueryBuilder();
         $builder
-        ->select('COUNT(events.id) AS entities')
-        ->from('events')
-        ->where('events.entity_type = :entity')
-        ->andWhere('events.entity_id = :id')
-        ->setParameter('entity', $entity->getType())
-        ->setParameter('id', $entity->getPlainId())
+            ->select('COUNT(events.id) AS entities')
+            ->from('events')
+            ->where('events.entity_type = :entity')->andWhere('events.entity_id = :id')
+            ->setParameter('entity', $entity->getType())
+            ->setParameter('id', $entity->getPlainId())
         ;
         $result = $builder->execute()->fetchColumn();
 
