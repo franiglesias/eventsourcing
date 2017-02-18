@@ -7,13 +7,11 @@
 
         "milhojas/messaging": "^1.1",
         "ramsey/uuid": "^3.5",
-        "doctrine/orm": "^2.5",
         "doctrine/dbal": "^2.5"
     },
     "require-dev": {
         "phpspec/phpspec": "^3.2",
-        "phpunit/phpunit": "^5.7",
-        "doctrine/data-fixtures": "^1.2"
+        "phpunit/phpunit": "^5.7"
     },
     "config": {
         "bin-dir": "bin/"

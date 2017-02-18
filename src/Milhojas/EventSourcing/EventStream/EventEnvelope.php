@@ -3,7 +3,6 @@
 namespace Milhojas\EventSourcing\EventStream;
 
 use Ramsey\Uuid\Uuid;
-use Milhojas\EventSourcing\DTO\EventDTO;
 
 /**
  * Contains metadata for event messages.
@@ -14,7 +13,7 @@ class EventEnvelope
     private $time;
     private $metadata;
 
-    private function __construct($id, $time, $metadata)
+    public function __construct($id, $time, $metadata)
     {
         $this->id = $id;
         $this->time = $time;
@@ -25,17 +24,8 @@ class EventEnvelope
     {
         return new static(
             self::autoAssignIdentity(),
-            new \DateTimeImmutable(),
+            new \DateTime(),
             array()
-        );
-    }
-
-    public static function fromEventDTO(EventDTO $dto)
-    {
-        return new static(
-            $dto->getId(),
-            $dto->getTime(),
-            $dto->getMetadata()
         );
     }
 

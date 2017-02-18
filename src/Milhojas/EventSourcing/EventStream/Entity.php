@@ -1,13 +1,13 @@
 <?php
 
-namespace Milhojas\EventSourcing\DTO;
+namespace Milhojas\EventSourcing\EventStream;
 
 use Milhojas\EventSourcing\Domain\EventSourced;
 
 /**
  * Transports information about entity type, id, and version.
  */
-class EntityDTO
+class Entity
 {
     /**
      * @var int
@@ -32,11 +32,6 @@ class EntityDTO
     public static function fromEntity(EventSourced $entity)
     {
         return new static(get_class($entity), $entity->getId(), $entity->getVersion());
-    }
-
-    public static function fromEventDTO(EventDTO $dto)
-    {
-        return new static($dto->getEntityType(), $dto->getEntityId(), $dto->getVersion());
     }
 
     public function getType()
