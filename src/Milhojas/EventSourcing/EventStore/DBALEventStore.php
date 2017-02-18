@@ -10,6 +10,9 @@ use Milhojas\EventSourcing\Exceptions as Exception;
 
 class DBALEventStore extends EventStore
 {
+    /**
+     * @var Doctrine\DBAL\Connection
+     */
     private $connection;
 
     public function __construct(Connection $connection)
@@ -17,6 +20,9 @@ class DBALEventStore extends EventStore
         $this->connection = $connection;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function loadStream(Entity $entity)
     {
         $this->connection->beginTransaction();
@@ -34,6 +40,9 @@ class DBALEventStore extends EventStore
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function saveStream(EventStream $stream)
     {
         $this->connection->beginTransaction();
@@ -49,7 +58,12 @@ class DBALEventStore extends EventStore
         }
     }
 
-    public function saveEvent(EventMessage $message)
+    /**
+     * Stores a single event.
+     *
+     * @param EventMessage $message
+     */
+    protected function saveEvent(EventMessage $message)
     {
         $sql = 'INSERT events SET events.id = :id, events.event_type = :type, events.event = :event, events.entity_type = :entity_type, events.entity_id = :entity_id, events.version = :version, events.timestamp = :timestamp, events.metadata = :metadata';
         $stmt = $this->connection->prepare($sql);
@@ -64,6 +78,11 @@ class DBALEventStore extends EventStore
         $stmt->execute();
     }
 
+    /**
+     * Retrieves the data for an Entity.
+     *
+     * @param Entity $entity
+     */
     private function getStoredData(Entity $entity)
     {
         $sql = $this->buildDQL($entity);

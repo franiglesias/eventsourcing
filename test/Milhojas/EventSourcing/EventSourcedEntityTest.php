@@ -3,7 +3,6 @@
 namespace Test\EventSourcing;
 
 use Milhojas\Messaging\EventBus\Event;
-use Milhojas\Library\ValueObjects\Identity\Id;
 use Milhojas\EventSourcing\Domain\EventSourcedEntity;
 
 class TestESEntity extends EventSourcedEntity
