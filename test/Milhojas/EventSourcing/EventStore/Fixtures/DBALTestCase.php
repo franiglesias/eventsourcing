@@ -34,7 +34,7 @@ class DBALTestCase extends \PHPUnit_Framework_TestCase
 
     public function tearDown()
     {
-        //$this->destroyDatabase();
+        $this->destroyDatabase();
     }
     /**
      * Executes fixtures.
@@ -114,7 +114,7 @@ class DBALTestCase extends \PHPUnit_Framework_TestCase
         $connectionParams = [
             'driver' => 'pdo_mysql',
             'user' => 'root',
-            'password' => 'root',
+            'password' => 'Fi36101628',
             'dbname' => 'testmilhojas',
             'host' => 'localhost',
         ];

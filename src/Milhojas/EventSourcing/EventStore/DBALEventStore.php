@@ -6,8 +6,8 @@ use Doctrine\DBAL\Connection;
 use Milhojas\EventSourcing\EventStream\EventStream;
 use Milhojas\EventSourcing\EventStream\EventMessage;
 use Milhojas\EventSourcing\DTO\EntityDTO;
-use Milhojas\EventSourcing\DTO\EventDTO;
 use Milhojas\EventSourcing\Exceptions as Exception;
+use Milhojas\EventSourcing\EventStream\EventEnvelope;
 
 class DBALEventStore extends EventStore
 {
@@ -20,47 +20,71 @@ class DBALEventStore extends EventStore
 
     public function loadStream(EntityDTO $entity)
     {
-        $stream = new EventStream();
-        foreach ($this->getStoredData($entity) as $dto) {
-            $stream->recordThat(EventMessage::fromEventDTO($dto));
-        }
+        $this->connection->beginTransaction();
+        try {
+            $stream = new EventStream();
+            foreach ($this->getStoredData($entity) as $dto) {
+                $message = new EventMessage(
+                    unserialize($dto['event']),
+                    new EntityDTO($dto['entity_type'], $dto['entity_id'], $dto['version']),
+                    new EventEnvelope(
+                        $dto['id'],
+                        new \DateTime($dto['timestamp']),
+                        unserialize($dto['metadata'])
+                        )
+                );
+                $stream->recordThat($message);
+            }
+            $this->connection->commit();
 
-        return $stream;
+            return $stream;
+        } catch (\Exception $e) {
+            $this->connection->rollBack();
+            throw $e;
+        }
     }
 
     public function saveStream(EventStream $stream)
     {
-        foreach ($stream as $message) {
-            $this->checkVersion($message->getEntity());
-            $this->saveEvent($message);
+        $this->connection->beginTransaction();
+        try {
+            foreach ($stream as $message) {
+                $this->checkVersion($message->getEntity());
+                $this->saveEvent($message);
+            }
+            $this->connection->commit();
+        } catch (\Exception $e) {
+            $this->connection->rollBack();
+            throw $e;
         }
     }
 
     public function saveEvent(EventMessage $message)
     {
-        $builder = $this->connection->createQueryBuilder();
-        $builder->update('events')
-        ->set('events.id', $message->getId())
-        ->set('events.type', get_class($message->getEvent()))
-        ->set('events.event', ':event')
-        ->set('events.entity_type', $message->getEntity()->getType())
-        ->set('events.entity_id', $message->getEntity()->getId())
-        ->set('events.version', $message->getEntity()->getVersion())
-        ->set('events.timestamp', ':time')
-        ->set('events.metadata', ':metadata')
-        ->setParameter(':event', $message->getEvent(), 'object')
-        ->setParameter(':time', $message->getEnvelope()->getTime(), 'datetimetz')
-        ->setParameter(':metadata', $message->getMetadata(), \Doctrine\DBAL\Connection::PARAM_STR_ARRAY)
-        ;
-        $builder->execute();
+        $sql = 'INSERT events SET events.id = :id, events.event_type = :type, events.event = :event, events.entity_type = :entity_type, events.entity_id = :entity_id, events.version = :version, events.timestamp = :timestamp, events.metadata = :metadata';
+        $stmt = $this->connection->prepare($sql);
+        $stmt->bindValue('id', $message->getId());
+        $stmt->bindValue('type', get_class($message->getEvent()));
+        $stmt->bindValue('event', $message->getEvent(), 'object');
+        $stmt->bindValue('entity_type', $message->getEntity()->getType());
+        $stmt->bindValue('entity_id', $message->getEntity()->getId());
+        $stmt->bindValue('version', $message->getEntity()->getVersion());
+        $stmt->bindValue('timestamp', $message->getEnvelope()->getTime(), 'datetimetz');
+        $stmt->bindValue('metadata', $message->getMetadata(), 'array');
+        $stmt->execute();
     }
 
     private function getStoredData(EntityDTO $entity)
     {
-        $dtos = $this->connection
-            ->createQuery($this->buildDQL($entity))
-            ->setParameters($this->buildParameters($entity))
-            ->getResult();
+        $sql = $this->buildDQL($entity);
+        $stmt = $this->connection->prepare($sql);
+        $stmt->bindValue('entity_type', $entity->getType());
+        $stmt->bindValue('entity_id', $entity->getId());
+        if ($entity->getVersion()) {
+            $stmt->bindValue('version', $entity->getVersion());
+        }
+        $stmt->execute();
+        $dtos = $stmt->fetchAll();
 
         if (!$dtos) {
             throw new Exception\EntityNotFound(sprintf('No events found for entity: %s', $entity->getType()), 2);
@@ -71,7 +95,7 @@ class DBALEventStore extends EventStore
 
     private function buildDQL(EntityDTO $entity)
     {
-        $query = 'SELECT events FROM EventStore:EventDTO events WHERE events.entity_type = :entity AND events.entity_id = :id';
+        $query = 'SELECT * FROM events WHERE events.entity_type = :entity_type AND events.entity_id = :entity_id';
         if ($entity->getVersion()) {
             $query .= ' AND events.version <= :version';
         }
@@ -95,19 +119,33 @@ class DBALEventStore extends EventStore
 
     public function countEntitiesOfType($type)
     {
-        return $this->connection
-            ->createQuery('SELECT COUNT(events.id) FROM EventStore:EventDTO events WHERE events.entity_type = :entity AND events.version = 1')
-            ->setParameter('entity', $type)
-            ->getSingleScalarResult();
+        $builder = $this->connection->createQueryBuilder();
+        $builder
+        ->select('COUNT(events.id) AS entities')
+        ->from('events')
+        ->where('events.entity_type = :entity')
+        ->andWhere('events.version = 1')
+        ->setParameter('entity', $type)
+        ;
+        $result = $builder->execute()->fetchColumn();
+
+        return (int) $result;
     }
 
     public function count(EntityDTO $entity)
     {
-        return $this->connection
-            ->createQuery('SELECT COUNT(events.id) FROM EventStore:EventDTO events WHERE events.entity_type = :entity AND events.entity_id = :id')
-            ->setParameter('entity', $entity->getType())
-            ->setParameter('id', $entity->getPlainId())
-            ->getSingleScalarResult();
+        $builder = $this->connection->createQueryBuilder();
+        $builder
+        ->select('COUNT(events.id) AS entities')
+        ->from('events')
+        ->where('events.entity_type = :entity')
+        ->andWhere('events.entity_id = :id')
+        ->setParameter('entity', $entity->getType())
+        ->setParameter('id', $entity->getPlainId())
+        ;
+        $result = $builder->execute()->fetchColumn();
+
+        return (int) $result;
     }
 
     protected function getStoredVersion(EntityDTO $entity)
@@ -116,10 +154,8 @@ class DBALEventStore extends EventStore
         $builder
             ->select('MAX(events.version) AS stored_version')
             ->from('events')
-            ->where($builder->expr()->andX(
-                $builder->expr()->eq('events.entity_type', ':entity'),
-                $builder->expr()->eq('events.entity_id', ':id')
-            ))
+            ->where('events.entity_type = :entity')
+            ->andWhere('events.entity_id = :id')
             ->setParameter('entity', $entity->getType())
             ->setParameter('id', $entity->getPlainId());
         $result = $builder->execute()->fetchColumn();

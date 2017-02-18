@@ -83,7 +83,7 @@ class DoctrineTestCase extends \PHPUnit_Framework_TestCase
         $connectionParams = [
             'driver' => 'pdo_mysql',
             'user' => 'root',
-            'password' => 'root',
+            'password' => 'Fi36101628',
             'dbname' => 'testmilhojas',
         ];
 

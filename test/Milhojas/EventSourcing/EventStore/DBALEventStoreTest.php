@@ -16,9 +16,18 @@ class DBALEventStoreTest extends DBALTestCase
     {
         $this->assertEquals(1, 1);
     }
-
-    public function x_test_it_loads_stream_with_3_events()
+    public function test_it_can_store_a_stream()
     {
+        $storage = new DBALEventStore($this->connection);
+        $stream = $this->prepareEventStream('Entity', 3, 5);
+        $storage->saveStream($stream);
+        $this->assertEquals(1, $storage->countEntitiesOfType('Entity'));
+        $this->assertEquals(5, $storage->count(new EntityDTO('Entity', 3, 0)));
+    }
+
+    public function test_it_loads_stream_with_3_events()
+    {
+        $this->prepareFixturesEntity1();
         $storage = new DBALEventStore($this->connection);
         $result = $storage->loadStream(new EntityDTO('Entity', 1));
         $this->assertEquals(3, $result->count());
@@ -62,15 +71,6 @@ class DBALEventStoreTest extends DBALTestCase
         $this->assertEquals(6, $storage->count(new EntityDTO('Entity', 2, 0)));
     }
 
-    public function test_it_can_store_a_stream()
-    {
-        $storage = new DBALEventStore($this->connection);
-        $stream = $this->prepareEventStream('Entity', 3, 5);
-        $storage->saveStream($stream);
-        $this->assertEquals(3, $storage->countEntitiesOfType('Entity'));
-        $this->assertEquals(5, $storage->count(new EntityDTO('Entity', 3, 0)));
-    }
-
     public function x_test_it_can_save_a_new_stream()
     {
         $storage = new DBALEventStore($this->connection);
@@ -107,5 +107,22 @@ class DBALEventStoreTest extends DBALTestCase
         }
 
         return $stream;
+    }
+
+    public function prepareFixturesEntity1()
+    {
+        $storage = new DBALEventStore($this->connection);
+        $stream = $this->prepareEventStream('Entity', 1, 3);
+        $storage->saveStream($stream);
+    }
+    private function prepareFixtures()
+    {
+        $storage = new DBALEventStore($this->connection);
+        $stream = $this->prepareEventStream('Other', 1, 4);
+        $storage->saveStream($stream);
+
+        $storage = new DBALEventStore($this->connection);
+        $stream = $this->prepareEventStream('Entity', 2, 6);
+        $storage->saveStream($stream);
     }
 }

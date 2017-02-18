@@ -14,7 +14,7 @@ class EventEnvelope
     private $time;
     private $metadata;
 
-    private function __construct($id, $time, $metadata)
+    public function __construct($id, $time, $metadata)
     {
         $this->id = $id;
         $this->time = $time;
