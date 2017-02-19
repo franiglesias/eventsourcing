@@ -36,42 +36,50 @@ class DBALEventStoreTest extends DBALTestCase
     /**
      * @expectedException \Milhojas\EventSourcing\Exceptions\EntityNotFound
      */
-    public function x_test_throw_exception_if_there_is_no_info_for_entity()
+    public function test_throw_exception_if_there_is_no_info_for_entity()
     {
         $storage = new DBALEventStore($this->connection);
         $result = $storage->loadStream(new Entity('Entity', 5));
     }
 
-    public function x_test_it_loads_other_stream_with_4_events()
+    public function test_it_loads_other_stream_with_4_events()
     {
+        $this->prepareFixturesOther1();
         $storage = new DBALEventStore($this->connection);
         $result = $storage->loadStream(new Entity('Other', 1));
         $this->assertEquals(4, $result->count());
     }
 
-    public function x_test_it_loads_entity_2_stream_with_6_events()
+    public function test_it_loads_entity_2_stream_with_6_events()
     {
+        $this->prepareFixturesEntity2();
         $storage = new DBALEventStore($this->connection);
         $result = $storage->loadStream(new Entity('Entity', 2));
         $this->assertEquals(6, $result->count());
     }
 
-    public function x_test_it_can_count_enitites_stored()
+    public function test_it_can_count_enitites_stored()
     {
+        $this->prepareFixturesOther1();
+        $this->prepareFixturesEntity1();
+        $this->prepareFixturesEntity2();
         $storage = new DBALEventStore($this->connection);
         $this->assertEquals(2, $storage->countEntitiesOfType('Entity'));
         $this->assertEquals(1, $storage->countEntitiesOfType('Other'));
     }
 
-    public function x_test_it_can_count_events_for_an_entity()
+    public function test_it_can_count_events_for_an_entity()
     {
+        $this->prepareFixturesOther1();
+        $this->prepareFixturesEntity1();
+        $this->prepareFixturesEntity2();
         $storage = new DBALEventStore($this->connection);
         $this->assertEquals(3, $storage->count(new Entity('Entity', 1, 0)));
         $this->assertEquals(4, $storage->count(new Entity('Other', 1, 0)));
         $this->assertEquals(6, $storage->count(new Entity('Entity', 2, 0)));
     }
 
-    public function x_test_it_can_save_a_new_stream()
+    public function test_it_can_save_a_new_stream()
     {
         $storage = new DBALEventStore($this->connection);
         $stream = $this->prepareEventStream('Model', 1, 1);
@@ -83,14 +91,15 @@ class DBALEventStoreTest extends DBALTestCase
     /**
      * @expectedException \Milhojas\EventSourcing\Exceptions\ConflictingVersion
      */
-    public function x_test_it_detects_a_conflicting_version()
+    public function test_it_detects_a_conflicting_version()
     {
+        $this->prepareFixturesEntity2();
         $storage = new DBALEventStore($this->connection);
         $stream = $this->prepareEventStream('Entity', 2, 3);
         $storage->saveStream($stream);
     }
 
-    public function x_test_it_can_save_a_stream_and_load_it_and_remains_equal()
+    public function test_it_can_save_a_stream_and_load_it_and_remains_equal()
     {
         $storage = new DBALEventStore($this->connection);
         $stream = $this->prepareEventStream('Entity', 3, 20);
@@ -115,14 +124,17 @@ class DBALEventStoreTest extends DBALTestCase
         $stream = $this->prepareEventStream('Entity', 1, 3);
         $storage->saveStream($stream);
     }
-    private function prepareFixtures()
+
+    public function prepareFixturesEntity2()
+    {
+        $storage = new DBALEventStore($this->connection);
+        $stream = $this->prepareEventStream('Entity', 2, 6);
+        $storage->saveStream($stream);
+    }
+    private function prepareFixturesOther1()
     {
         $storage = new DBALEventStore($this->connection);
         $stream = $this->prepareEventStream('Other', 1, 4);
-        $storage->saveStream($stream);
-
-        $storage = new DBALEventStore($this->connection);
-        $stream = $this->prepareEventStream('Entity', 2, 6);
         $storage->saveStream($stream);
     }
 }
