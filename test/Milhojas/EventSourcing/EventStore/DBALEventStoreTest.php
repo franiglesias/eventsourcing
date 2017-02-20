@@ -21,8 +21,6 @@ class DBALEventStoreTest extends TestCase
 
     public function setUp()
     {
-        // $classLoader = new ClassLoader('Doctrine', dirname(dirname(dirname(dirname(dirname(__DIR__))))).'/vendor/doctrine');
-        // $classLoader->register();
         $this->connection = $this->getConnection();
         $this->storage = new DBALEventStore($this->connection, 'events');
         $this->storage->setUpStore();
