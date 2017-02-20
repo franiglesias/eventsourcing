@@ -31,7 +31,7 @@ class DBALEventStore extends EventStore
         $this->connection->beginTransaction();
         try {
             $stream = new EventStream();
-            foreach ($this->getStoredData($entity) as $dto) {
+            foreach ($this->getDataForEntity($entity) as $dto) {
                 $stream->recordThat(EventMessage::fromDtoArray($dto));
             }
             $this->connection->commit();
@@ -52,7 +52,7 @@ class DBALEventStore extends EventStore
         try {
             foreach ($stream as $message) {
                 $this->checkVersion($message->getEntity());
-                $this->writeEvent($message);
+                $this->storeSingleEvent($message);
             }
             $this->connection->commit();
         } catch (\Exception $e) {
@@ -88,7 +88,7 @@ class DBALEventStore extends EventStore
      *
      * @param EventMessage $message
      */
-    protected function writeEvent(EventMessage $message)
+    protected function storeSingleEvent(EventMessage $message)
     {
         $builder = $this->connection->createQueryBuilder();
         $builder
@@ -120,7 +120,7 @@ class DBALEventStore extends EventStore
      *
      * @param Entity $entity
      */
-    private function getStoredData(Entity $entity)
+    private function getDataForEntity(Entity $entity)
     {
         $builder = $this->connection->createQueryBuilder();
         $builder
