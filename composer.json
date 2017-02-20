@@ -3,16 +3,15 @@
     "description": "A simple library to start with eventsourcing",
     "type": "library",
     "require": {
-        "php": "^5.5 || ^7.0",
-
+        "php": "^5.6 || ^7.0",
         "milhojas/messaging": "^1.1",
         "ramsey/uuid": "^3.5",
-        "doctrine/dbal": "^2.5",
-        "symfony/yaml": "^3.2"
+        "doctrine/dbal": "^2.5"
     },
     "require-dev": {
         "phpspec/phpspec": "^3.2",
-        "phpunit/phpunit": "^5.7"
+        "phpunit/phpunit": "^5.7",
+        "symfony/yaml": "^3.2"
     },
     "config": {
         "bin-dir": "bin/"

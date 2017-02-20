@@ -42,7 +42,7 @@ abstract class EventStore
     abstract public function count(Entity $entity);
 
     /**
-     * Compares aggregate's current version with the stored version. If thery are out of sync throws exception.
+     * Compares aggregate's current version with the stored version. If they are out of sync throws exception.
      *
      * @param Entity $entity
      *

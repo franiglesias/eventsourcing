@@ -78,7 +78,7 @@ abstract class EventSourcedEntity implements EventSourced
     }
 
     /**
-     * Applies and record an event.
+     * Applies and records an event.
      *
      * @param Event $event
      *
