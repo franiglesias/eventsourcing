@@ -3,6 +3,7 @@
 namespace Milhojas\EventSourcing\EventStore;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Schema\Schema;
 use Milhojas\EventSourcing\EventStream\EventStream;
 use Milhojas\EventSourcing\EventStream\EventMessage;
 use Milhojas\EventSourcing\EventStream\Entity;
@@ -14,10 +15,12 @@ class DBALEventStore extends EventStore
      * @var Doctrine\DBAL\Connection
      */
     private $connection;
+    private $table;
 
-    public function __construct(Connection $connection)
+    public function __construct(Connection $connection, $table = 'events')
     {
         $this->connection = $connection;
+        $this->table = $table;
     }
 
     /**
@@ -55,6 +58,28 @@ class DBALEventStore extends EventStore
         } catch (\Exception $e) {
             $this->connection->rollBack();
             throw $e;
+        }
+    }
+
+    /**
+     * Prepares the events table for the passed DBAL connection.
+     */
+    public function setUpStore()
+    {
+        if (!$this->tableExists()) {
+            $queries = $this->getSchema()->toSql($this->connection->getDatabasePlatform());
+            $this->executeSchemaQueries($queries);
+        }
+    }
+
+    /**
+     * Destroys the events table for the passed DBAL connection.
+     */
+    public function tearDownStore()
+    {
+        if ($this->tableExists()) {
+            $queries = $this->getSchema()->toDropSql($this->connection->getDatabasePlatform());
+            $this->executeSchemaQueries($queries);
         }
     }
 
@@ -155,5 +180,44 @@ class DBALEventStore extends EventStore
         $result = $builder->execute()->fetchColumn();
 
         return (int) $result;
+    }
+
+    private function getSchema()
+    {
+        $schema = new Schema();
+        $table = $schema->createTable($this->table);
+        $table->addColumn('id', 'string');
+        $table->addColumn('event_type', 'string');
+        $table->addColumn('event', 'object');
+        $table->addColumn('timestamp', 'datetimetz');
+        $table->addColumn('version', 'integer', array('unsigned' => true));
+        $table->addColumn('entity_type', 'string');
+        $table->addColumn('entity_id', 'string');
+        $table->addColumn('metadata', 'array');
+        $table->addIndex(['entity_type', 'entity_id']);
+
+        $table->setPrimaryKey(array('id'));
+
+        return $schema;
+    }
+
+    /**
+     * Checks if Events table exists.
+     */
+    private function tableExists()
+    {
+        return $this->connection->getSchemaManager()->tablesExist($this->table);
+    }
+
+    /**
+     * Executes an array of queries.
+     *
+     * @param array $queries
+     */
+    private function executeSchemaQueries(array $queries)
+    {
+        array_walk($queries, function ($query) {
+            $this->connection->query($query);
+        });
     }
 }

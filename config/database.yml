@@ -1,0 +1,12 @@
+doctrine:
+    dbal:
+        default_connection: test
+
+        connections:
+            test:
+                driver:  'pdo_mysql'
+                user:    'root'
+                password: 'root'
+                dbbame: 'testmilhojas'
+                host: 'localhost'
+                charset: utf8mb4

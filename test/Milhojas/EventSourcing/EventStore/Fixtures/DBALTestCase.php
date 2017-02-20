@@ -6,9 +6,9 @@ namespace Test\EventSourcing\EventStore\Fixtures;
 
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Configuration;
-use Doctrine\DBAL\Schema\Schema;
 use Doctrine\ORM\Tools\Setup;
 use Doctrine\Common\ClassLoader;
+use Milhojas\EventSourcing\EventStore\DBALEventStore;
 
 /**
  * Class DoctrineTestCase.
@@ -19,65 +19,22 @@ class DBALTestCase extends \PHPUnit_Framework_TestCase
 {
     protected $connection;
     protected $schema;
+    protected $storage;
 
     public function setUp()
     {
-        $classLoader = new ClassLoader('Doctrine', dirname(dirname(dirname(dirname(dirname(__DIR__))))).'/vendor/doctrine');
-        $classLoader->register();
+        // $classLoader = new ClassLoader('Doctrine', dirname(dirname(dirname(dirname(dirname(__DIR__))))).'/vendor/doctrine');
+        // $classLoader->register();
         $this->connection = $this->getConnection();
-        $this->schema = $this->getSchema();
-        $this->createDatabase();
+        $this->storage = new DBALEventStore($this->connection, 'events');
+        $this->storage->setUpStore();
     }
 
     public function tearDown()
     {
-        $this->destroyDatabase();
+        $this->storage->tearDownStore();
     }
 
-    public function createDatabase()
-    {
-        $queries = $this->schema->toSql($this->connection->getDatabasePlatform());
-        $manager = $this->connection->getSchemaManager();
-
-        if (!$manager->tablesExist('events')) {
-            array_walk($queries, function ($query) {
-                $this->connection->query($query);
-            });
-        }
-    }
-
-    public function destroyDatabase()
-    {
-        $queries = $this->schema->toDropSql($this->connection->getDatabasePlatform());
-        $manager = $this->connection->getSchemaManager();
-
-        if ($manager->tablesExist('events')) {
-            array_walk($queries, function ($query) {
-                $this->connection->query($query);
-            });
-        }
-    }
-    /**
-     * @return Schema
-     */
-    public function getSchema()
-    {
-        $schema = new Schema();
-        $table = $schema->createTable('events');
-        $table->addColumn('id', 'string');
-        $table->addColumn('event_type', 'string');
-        $table->addColumn('event', 'object');
-        $table->addColumn('timestamp', 'datetimetz');
-        $table->addColumn('version', 'integer', array('unsigned' => true));
-        $table->addColumn('entity_type', 'string');
-        $table->addColumn('entity_id', 'string');
-        $table->addColumn('metadata', 'array');
-        $table->addIndex(['entity_type', 'entity_id']);
-
-        $table->setPrimaryKey(array('id'));
-
-        return $schema;
-    }
     /**
      * @return \Doctrine\DBAL\Connection
      */
@@ -88,7 +45,7 @@ class DBALTestCase extends \PHPUnit_Framework_TestCase
         $connectionParams = [
             'driver' => 'pdo_mysql',
             'user' => 'root',
-            'password' => 'Fi36101628',
+            'password' => 'root',
             'dbname' => 'testmilhojas',
             'host' => 'localhost',
         ];
