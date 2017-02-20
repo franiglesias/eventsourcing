@@ -52,7 +52,7 @@ class DBALEventStore extends EventStore
         try {
             foreach ($stream as $message) {
                 $this->checkVersion($message->getEntity());
-                $this->saveEvent($message);
+                $this->writeEvent($message);
             }
             $this->connection->commit();
         } catch (\Exception $e) {
@@ -88,19 +88,31 @@ class DBALEventStore extends EventStore
      *
      * @param EventMessage $message
      */
-    protected function saveEvent(EventMessage $message)
+    protected function writeEvent(EventMessage $message)
     {
-        $sql = 'INSERT events SET events.id = :id, events.event_type = :type, events.event = :event, events.entity_type = :entity_type, events.entity_id = :entity_id, events.version = :version, events.timestamp = :timestamp, events.metadata = :metadata';
-        $stmt = $this->connection->prepare($sql);
-        $stmt->bindValue('id', $message->getId());
-        $stmt->bindValue('type', get_class($message->getEvent()));
-        $stmt->bindValue('event', $message->getEvent(), 'object');
-        $stmt->bindValue('entity_type', $message->getEntity()->getType());
-        $stmt->bindValue('entity_id', $message->getEntity()->getId());
-        $stmt->bindValue('version', $message->getEntity()->getVersion());
-        $stmt->bindValue('timestamp', $message->getEnvelope()->getTime(), 'datetimetz');
-        $stmt->bindValue('metadata', $message->getMetadata(), 'array');
-        $stmt->execute();
+        $builder = $this->connection->createQueryBuilder();
+        $builder
+            ->insert($this->table)
+            ->values([
+                'id' => ':id',
+                'event_type' => ':type',
+                'event' => ':event',
+                'entity_type' => ':entity_type',
+                'entity_id' => ':entity_id',
+                'version' => ':version',
+                'timestamp' => ':timestamp',
+                'metadata' => ':metadata',
+            ])
+            ->setParameter('id', $message->getId())
+            ->setParameter('type', get_class($message->getEvent()))
+            ->setParameter('event', $message->getEvent(), 'object')
+            ->setParameter('entity_type', $message->getEntity()->getType())
+            ->setParameter('entity_id', $message->getEntity()->getId())
+            ->setParameter('version', $message->getEntity()->getVersion())
+            ->setParameter('timestamp', $message->getEnvelope()->getTime(), 'datetimetz')
+            ->setParameter('metadata', $message->getMetadata(), 'array')
+        ;
+        $builder->execute();
     }
 
     /**
@@ -110,15 +122,27 @@ class DBALEventStore extends EventStore
      */
     private function getStoredData(Entity $entity)
     {
-        $sql = $this->buildDQL($entity);
-        $stmt = $this->connection->prepare($sql);
-        $stmt->bindValue('entity_type', $entity->getType());
-        $stmt->bindValue('entity_id', $entity->getId());
+        $builder = $this->connection->createQueryBuilder();
+        $builder
+        ->select('*')
+        ->from($this->table)
+        ->where('entity_type = :entity_type')
+        ->andWhere('entity_id = :entity_id')
+        ->setParameters([
+            'entity_type' => $entity->getType(),
+            'entity_id' => $entity->getId(),
+        ])
+        ->orderBy('entity_type', 'ASC')
+        ->addOrderBy('entity_id', 'ASC')
+        ->addOrderBy('version', 'ASC')
+        ;
         if ($entity->getVersion()) {
-            $stmt->bindValue('version', $entity->getVersion());
+            $builder
+                ->andWhere('version = :version')
+                ->setParameter('version', $entity->getVersion())
+            ;
         }
-        $stmt->execute();
-        $dtos = $stmt->fetchAll();
+        $dtos = $builder->execute()->fetchAll();
 
         if (!$dtos) {
             throw new Exception\EntityNotFound(sprintf('No events found for entity: %s', $entity->getType()), 2);
@@ -127,24 +151,13 @@ class DBALEventStore extends EventStore
         return $dtos;
     }
 
-    private function buildDQL(Entity $entity)
-    {
-        $query = 'SELECT * FROM events WHERE events.entity_type = :entity_type AND events.entity_id = :entity_id';
-        if ($entity->getVersion()) {
-            $query .= ' AND events.version <= :version';
-        }
-        $query .= ' ORDER BY events.entity_type, events.entity_id, events.version';
-
-        return $query;
-    }
-
     public function countEntitiesOfType($type)
     {
         $builder = $this->connection->createQueryBuilder();
         $builder
-            ->select('COUNT(events.id) AS entities')
+            ->select('COUNT(id) AS entities')
             ->from('events')
-            ->where('events.entity_type = :entity')->andWhere('events.version = 1')
+            ->where('entity_type = :entity')->andWhere('version = 1')
             ->setParameter('entity', $type)
         ;
         $result = $builder->execute()->fetchColumn();
@@ -156,9 +169,9 @@ class DBALEventStore extends EventStore
     {
         $builder = $this->connection->createQueryBuilder();
         $builder
-            ->select('COUNT(events.id) AS entities')
-            ->from('events')
-            ->where('events.entity_type = :entity')->andWhere('events.entity_id = :id')
+            ->select('COUNT(id) AS entities')
+            ->from($this->table)
+            ->where('entity_type = :entity')->andWhere('entity_id = :id')
             ->setParameter('entity', $entity->getType())
             ->setParameter('id', $entity->getPlainId())
         ;
@@ -171,10 +184,10 @@ class DBALEventStore extends EventStore
     {
         $builder = $this->connection->createQueryBuilder();
         $builder
-            ->select('MAX(events.version) AS stored_version')
-            ->from('events')
-            ->where('events.entity_type = :entity')
-            ->andWhere('events.entity_id = :id')
+            ->select('MAX(version) AS stored_version')
+            ->from($this->table)
+            ->where('entity_type = :entity')
+            ->andWhere('entity_id = :id')
             ->setParameter('entity', $entity->getType())
             ->setParameter('id', $entity->getPlainId());
         $result = $builder->execute()->fetchColumn();
