@@ -6,15 +6,51 @@ use Milhojas\EventSourcing\EventStream\Entity;
 use Milhojas\EventSourcing\EventStream\EventMessage;
 use Milhojas\EventSourcing\EventStream\EventEnvelope;
 use Milhojas\EventSourcing\EventStream\EventStream;
+use Milhojas\EventSourcing\EventStore\DBALEventStore;
 use Test\EventSourcing\Fixtures\EventDouble;
-use Test\EventSourcing\EventStore\Fixtures\DBALTestCase;
+use PHPUnit\Framework\TestCase;
+use Doctrine\DBAL\Configuration;
+use Doctrine\DBAL\DriverManager;
 
-class DBALEventStoreTest extends DBALTestCase
+class DBALEventStoreTest extends TestCase
 {
-    public function test_something()
+    protected $connection;
+    protected $schema;
+    protected $storage;
+
+    public function setUp()
     {
-        $this->assertEquals(1, 1);
+        // $classLoader = new ClassLoader('Doctrine', dirname(dirname(dirname(dirname(dirname(__DIR__))))).'/vendor/doctrine');
+        // $classLoader->register();
+        $this->connection = $this->getConnection();
+        $this->storage = new DBALEventStore($this->connection, 'events');
+        $this->storage->setUpStore();
     }
+
+    public function tearDown()
+    {
+        $this->storage->tearDownStore();
+    }
+
+    /**
+     * @return \Doctrine\DBAL\Connection
+     */
+    protected function getConnection()
+    {
+        $config = new Configuration();
+        // mysql://root:root@localhost/testmilhojas?charset=UTF-8
+        $connectionParams = [
+            'driver' => 'pdo_mysql',
+            'user' => 'root',
+            'password' => 'root',
+            'dbname' => 'testmilhojas',
+            'host' => 'localhost',
+        ];
+        $connection = DriverManager::getConnection($connectionParams, $config);
+
+        return $connection;
+    }
+
     public function test_it_can_store_a_stream()
     {
         $stream = $this->prepareEventStream('Entity', 3, 5);

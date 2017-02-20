@@ -15,8 +15,17 @@ class DBALEventStore extends EventStore
      * @var Doctrine\DBAL\Connection
      */
     private $connection;
+    /**
+     * The events table name, defaults to events.
+     *
+     * @var string
+     */
     private $table;
 
+    /**
+     * @param Connection $connection
+     * @param mixed      $table
+     */
     public function __construct(Connection $connection, $table = 'events')
     {
         $this->connection = $connection;
@@ -195,6 +204,11 @@ class DBALEventStore extends EventStore
         return (int) $result;
     }
 
+    /**
+     * Generates the events table schema.
+     *
+     * @return Schema The schema
+     */
     private function getSchema()
     {
         $schema = new Schema();
@@ -215,7 +229,7 @@ class DBALEventStore extends EventStore
     }
 
     /**
-     * Checks if Events table exists.
+     * Checks if the events table exists.
      */
     private function tableExists()
     {
@@ -223,7 +237,7 @@ class DBALEventStore extends EventStore
     }
 
     /**
-     * Executes an array of queries.
+     * Utility method to execute an array of queries.
      *
      * @param array $queries
      */
