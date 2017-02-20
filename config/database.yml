@@ -7,6 +7,12 @@ doctrine:
                 driver:  'pdo_mysql'
                 user:    'root'
                 password: 'root'
-                dbbame: 'testmilhojas'
+                dbname: 'testmilhojas'
+                host: 'localhost'
+                charset: utf8mb4
+            travis:
+                driver:  'pdo_mysql'
+                user:    'root'
+                dbname: 'testmilhojas'
                 host: 'localhost'
                 charset: utf8mb4

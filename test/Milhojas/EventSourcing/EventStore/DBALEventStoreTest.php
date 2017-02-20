@@ -11,6 +11,7 @@ use Test\EventSourcing\Fixtures\EventDouble;
 use PHPUnit\Framework\TestCase;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\DriverManager;
+use Symfony\Component\Yaml\Yaml;
 
 class DBALEventStoreTest extends TestCase
 {
@@ -38,20 +39,24 @@ class DBALEventStoreTest extends TestCase
     protected function getConnection()
     {
         $config = new Configuration();
-        // mysql://root:root@localhost/testmilhojas?charset=UTF-8
-        // $connectionParams = [
-        //     'driver' => 'pdo_mysql',
-        //     'user' => 'root',
-        //     'password' => 'root',
-        //     'dbname' => 'testmilhojas',
-        //     'host' => 'localhost',
-        // ];
-        $connectionParams = [
-            'url' => 'mysql://root@localhost/testmilhojas?charset=utf8mb4',
-        ];
-        $connection = DriverManager::getConnection($connectionParams, $config);
+        $connection = DriverManager::getConnection($this->getConfigurationData(), $config);
 
         return $connection;
+    }
+
+    /**
+     * @return mixed
+     */
+    private function getConfigurationData()
+    {
+        $configData = Yaml::parse(file_get_contents('config/database.yml'));
+        $useConnect = getenv('ENV_EVENT_SOURCING');
+        if (!$useConnect) {
+            $useConnect = $configData['doctrine']['dbal']['default_connection'];
+        }
+        $connectionParams = $configData['doctrine']['dbal']['connections'][$useConnect];
+
+        return $connectionParams;
     }
 
     public function test_it_can_store_a_stream()

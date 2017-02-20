@@ -1,5 +1,8 @@
 language: php
 
+env:
+    - travis
+
 services:
     - mysql
 
