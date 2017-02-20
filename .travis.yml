@@ -10,7 +10,7 @@ matrix:
 
 before_install:
     - if [[ $TRAVIS_PHP_VERSION = '5.6' ]] ; then echo yes | pecl install apcu-4.0.10; fi;
-    - mysql -e 'CREATE DATABASE testmilhojas;'
+    - mysql -e 'CREATE DATABASE IF NOT EXISTS testmilhojas;'
 
 before_script:
     - composer install

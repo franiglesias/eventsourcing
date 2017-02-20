@@ -39,12 +39,15 @@ class DBALEventStoreTest extends TestCase
     {
         $config = new Configuration();
         // mysql://root:root@localhost/testmilhojas?charset=UTF-8
+        // $connectionParams = [
+        //     'driver' => 'pdo_mysql',
+        //     'user' => 'root',
+        //     'password' => 'root',
+        //     'dbname' => 'testmilhojas',
+        //     'host' => 'localhost',
+        // ];
         $connectionParams = [
-            'driver' => 'pdo_mysql',
-            'user' => 'root',
-            'password' => 'root',
-            'dbname' => 'testmilhojas',
-            'host' => 'localhost',
+            'url' => 'mysql://root@localhost/testmilhojas?charset=utf8mb4',
         ];
         $connection = DriverManager::getConnection($connectionParams, $config);
 
