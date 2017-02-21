@@ -32,15 +32,12 @@ One of  the great advantages of this approach is that you can create new views a
 
 Require the dependency with composer
 
-    ```
     composer require milhojas/eventsourcing
-    ```
 
 ## Setup
 
 You will need a `config/database.yml` or `config/config.yml` file with configuration to define connections with the database server. Structure is the same as that in a Symfony app:
 
-    ```
     doctrine:
         dbal:
             default_connection: 'example'
@@ -59,15 +56,12 @@ You will need a `config/database.yml` or `config/config.yml` file with configura
                     host: 'localhost'
                     charset: utf8mb4
 
-    ```
 
 ### Create the events table in the database
 
 Run the following command
 
-    ```
     bin/eventsourcing events:setup
-    ```
 
 You are ready to run.
 
