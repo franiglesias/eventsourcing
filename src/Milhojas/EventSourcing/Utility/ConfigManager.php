@@ -43,7 +43,7 @@ class ConfigManager
     private function isValidConnection($connection)
     {
         if (!in_array($connection, $this->getAvailableConnections())) {
-            throw new \InvalidArgumentException(sprintf('Connection %s is not configured.', $connectionva));
+            throw new \InvalidArgumentException(sprintf('Connection %s is not configured.', $connection));
         }
     }
 }
