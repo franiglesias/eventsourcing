@@ -83,7 +83,11 @@ Events carry every information needed about the changes. For example, an UserAdd
 
 ### Event Message
 
-An Event Message is an envelope to Events. It carries metadata information for the Event, such as an id,
+An Event Message is an envelope for Events. It carries the Event itself and metadata information for it, such as an id, entity information and version, and arbitrary metadata.
+
+Internally, Event Message uses a Event Envelope object (deprecated) and a Entity object, that carries the minimal data needed to reconstitute the real entity (class name, id and version).
+
+_Note: Entity could be renamed to EntityMetadata for clarity_
 
 ### Event Stream
 
