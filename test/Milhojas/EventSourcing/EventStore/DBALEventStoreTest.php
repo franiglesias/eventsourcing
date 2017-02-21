@@ -6,11 +6,11 @@ use Milhojas\EventSourcing\EventStream\Entity;
 use Milhojas\EventSourcing\EventStream\EventMessage;
 use Milhojas\EventSourcing\EventStream\EventStream;
 use Milhojas\EventSourcing\EventStore\DBALEventStore;
+use Milhojas\EventSourcing\Utility\ConfigManager;
 use Test\EventSourcing\Fixtures\EventDouble;
 use PHPUnit\Framework\TestCase;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\DriverManager;
-use Symfony\Component\Yaml\Yaml;
 
 class DBALEventStoreTest extends TestCase
 {
@@ -46,14 +46,13 @@ class DBALEventStoreTest extends TestCase
      */
     private function getConfigurationData()
     {
-        $configData = Yaml::parse(file_get_contents('config/database.yml'));
+        $manager = new ConfigManager('config/database.yml');
         $useConnect = getenv('ENV_EVENT_SOURCING');
         if (!$useConnect) {
-            $useConnect = $configData['doctrine']['dbal']['default_connection'];
+            $useConnect = 'test';
         }
-        $connectionParams = $configData['doctrine']['dbal']['connections'][$useConnect];
 
-        return $connectionParams;
+        return $manager->getConfiguration($useConnect);
     }
 
     public function test_it_can_store_a_stream()
