@@ -11,7 +11,8 @@ class ConfigManagerSpec extends ObjectBehavior
 {
     public function let()
     {
-        $this->beConstructedWith($this->getConfigFile());
+        $this->beConstructedWith();
+        $this->setDefaultConfigFiles([$this->getConfigFile()]);
     }
     public function it_is_initializable()
     {
@@ -20,7 +21,6 @@ class ConfigManagerSpec extends ObjectBehavior
 
     public function it_can_locate_default_configuration_file()
     {
-        $this->beConstructedWith();
         $this->getAvailableConnections()->shouldBeArray();
     }
 
@@ -36,7 +36,7 @@ class ConfigManagerSpec extends ObjectBehavior
 
     public function it_throws_exception_if_invalid_configuration_file()
     {
-        $this->beConstructedWith($this->getInvalidFile());
+        $this->setDefaultConfigFiles([$this->getInvalidFile()]);
         $this->shouldThrow(\InvalidArgumentException::class)->during('getConfiguration', ['test']);
     }
 

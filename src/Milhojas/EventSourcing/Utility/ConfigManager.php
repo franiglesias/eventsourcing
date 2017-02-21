@@ -15,9 +15,6 @@ class ConfigManager
 
     public function __construct($file = null)
     {
-        if (!$file) {
-            $file = $this->getDefaultConfigurationFile();
-        }
         $this->file = $file;
         $this->data = null;
     }
@@ -43,6 +40,10 @@ class ConfigManager
             return;
         }
 
+        if (!$this->file) {
+            $this->file = $this->getDefaultConfigurationFile();
+        }
+
         $data = Yaml::parse(file_get_contents($this->file));
         $this->isValidConfiguration($data);
         $this->data = $data['doctrine'];
@@ -59,6 +60,7 @@ class ConfigManager
     {
         $this->hasDoctrineKey($data);
         $this->hasDbalKey($data);
+        $this->hasAtLeastOneConnection($data);
     }
 
     private function hasDoctrineKey($data)
@@ -75,6 +77,13 @@ class ConfigManager
         }
     }
 
+    public function hasAtLeastOneConnection($data)
+    {
+        if (!isset($data['doctrine']['dbal']['connections'])) {
+            throw new \InvalidArgumentException('It looks like there are not defined connections.');
+        }
+    }
+
     private function getDefaultConfigurationFile()
     {
         foreach ($this->defaults as $file) {
@@ -82,6 +91,11 @@ class ConfigManager
                 return $file;
             }
         }
-        throw new \InvalidArgumentException('Need a configuration file a config/database.yml or config/config.yml');
+        throw new \InvalidArgumentException('Need a configuration file such as config/database.yml or config/config.yml');
+    }
+
+    public function setDefaultConfigFiles(array $files)
+    {
+        $this->defaults = $files;
     }
 }
