@@ -13,7 +13,7 @@ class EventMessage
     private $envelope;
     private $entity;
 
-    public function __construct(Event $event, Entity $entity, EventEnvelope $envelope)
+    private function __construct(Event $event, Entity $entity, EventEnvelope $envelope)
     {
         $this->event = $event;
         $this->entity = $entity;
@@ -47,11 +47,6 @@ class EventMessage
         return $this->event;
     }
 
-    public function getEnvelope()
-    {
-        return $this->envelope;
-    }
-
     public function getEntity()
     {
         return $this->entity;
@@ -62,18 +57,32 @@ class EventMessage
         $this->envelope->addMetaData($key, $value);
     }
 
-    public function getMetaData()
-    {
-        return $this->envelope->getMetadata();
-    }
-
     public function __toString()
     {
         return sprintf('%s with %s', get_class($this->event), $this->entity);
     }
 
+    /**
+     * @return mixed Id
+     */
     public function getId()
     {
         return $this->envelope->getMessageId();
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getTime()
+    {
+        return $this->envelope->getTime();
+    }
+
+    /**
+     * @return array
+     */
+    public function getMetaData()
+    {
+        return $this->envelope->getMetadata();
     }
 }

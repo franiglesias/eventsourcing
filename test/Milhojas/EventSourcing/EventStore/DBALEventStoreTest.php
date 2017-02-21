@@ -4,7 +4,6 @@ namespace Test\EventSourcing\EventStore;
 
 use Milhojas\EventSourcing\EventStream\Entity;
 use Milhojas\EventSourcing\EventStream\EventMessage;
-use Milhojas\EventSourcing\EventStream\EventEnvelope;
 use Milhojas\EventSourcing\EventStream\EventStream;
 use Milhojas\EventSourcing\EventStore\DBALEventStore;
 use Test\EventSourcing\Fixtures\EventDouble;
@@ -142,7 +141,7 @@ class DBALEventStoreTest extends TestCase
     {
         $stream = new EventStream();
         for ($version = 1; $version <= $maxVersion; ++$version) {
-            $message = new EventMessage(new EventDouble($id), new Entity($entity, $id, $version), EventEnvelope::now());
+            $message = EventMessage::record(new EventDouble($id), new Entity($entity, $id, $version));
             $stream->recordThat($message);
         }
 

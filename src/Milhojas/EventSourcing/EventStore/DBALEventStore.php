@@ -9,6 +9,9 @@ use Milhojas\EventSourcing\EventStream\EventMessage;
 use Milhojas\EventSourcing\EventStream\Entity;
 use Milhojas\EventSourcing\Exceptions as Exception;
 
+/**
+ * {@inheritdoc}
+ */
 class DBALEventStore extends EventStore
 {
     /**
@@ -118,7 +121,7 @@ class DBALEventStore extends EventStore
             ->setParameter('entity_type', $message->getEntity()->getType())
             ->setParameter('entity_id', $message->getEntity()->getId())
             ->setParameter('version', $message->getEntity()->getVersion())
-            ->setParameter('timestamp', $message->getEnvelope()->getTime(), 'datetimetz')
+            ->setParameter('timestamp', $message->getTime(), 'datetimetz')
             ->setParameter('metadata', $message->getMetadata(), 'array')
         ;
         $builder->execute();
