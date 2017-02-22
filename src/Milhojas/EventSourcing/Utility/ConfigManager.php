@@ -89,6 +89,7 @@ class ConfigManager
     private function getDefaultConfigurationFile()
     {
         foreach ($this->defaults as $file) {
+            $file = getcwd().'/'.$file;
             if (file_exists($file)) {
                 return $file;
             }

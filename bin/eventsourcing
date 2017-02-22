@@ -1,12 +1,10 @@
 #!/usr/bin/env php
 <?php
 
-require dirname(__DIR__).'/vendor/autoload.php';
+require getcwd().'/vendor/autoload.php';
 
 use Symfony\Component\Console\Application;
 use Milhojas\EventSourcing\Command\SetUpCommand;
-
-print_r(__DIR__);
 
 $application = new Application();
 
