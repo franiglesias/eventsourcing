@@ -21,7 +21,7 @@ class SetUpCommand extends Command
             ->setHelp('This command allows you to create the needed events table in your databse.')
         ;
         $this->useConnection = getenv('ENV_EVENT_SOURCING');
-        $this->manager = new ConfigManager('config/database.yml');
+        $this->manager = new ConfigManager();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
