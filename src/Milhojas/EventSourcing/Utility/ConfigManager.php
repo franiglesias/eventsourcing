@@ -9,6 +9,8 @@ class ConfigManager
     private $data;
     private $file;
     private $defaults = [
+        'app/config/config.yml',
+        'app/config/database.yml',
         'config/database.yml',
         'config/config.yml',
     ];
