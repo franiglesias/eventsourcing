@@ -36,7 +36,15 @@ Require the dependency with composer
 
 ## Setup
 
-You will need a `config/database.yml` or `config/config.yml` file with configuration to define connections with the database server. Structure is the same as that in a Symfony app:
+You will need a file with configuration to define connections with the database server. Predefined locations under the project's root are:
+
+    app/config/database.yml
+    config/database.yml
+    config/config.yml
+    database.yml
+    config.yml
+
+Structure is the same as that in a Symfony app.
 
     doctrine:
         dbal:
@@ -56,6 +64,7 @@ You will need a `config/database.yml` or `config/config.yml` file with configura
                     host: 'localhost'
                     charset: utf8mb4
 
+_Known issue: eventsourcing can not use the Symfony doctrine:dbal configuration data_
 
 ### Create the events table in the database
 
@@ -63,7 +72,13 @@ Run the following command
 
     bin/eventsourcing events:setup
 
-You are ready to run.
+Use the -v flag to see what's happening
+
+    bin/eventsourcing events:setup -v
+
+_Known issue: table name is 'events' and cannot be configured_
+
+And you will be ready to run.
 
 ## Key concepts
 
