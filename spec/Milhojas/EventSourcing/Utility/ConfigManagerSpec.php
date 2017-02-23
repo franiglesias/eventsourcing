@@ -6,13 +6,14 @@ use Milhojas\EventSourcing\Utility\ConfigManager;
 use PhpSpec\ObjectBehavior;
 use Symfony\Component\Yaml\Yaml;
 use org\bovigo\vfs\vfsStream;
+use Psr\Log\LoggerInterface;
 
 class ConfigManagerSpec extends ObjectBehavior
 {
-    public function let()
+    public function let(LoggerInterface $logger)
     {
-        $this->beConstructedWith();
-        $this->setDefaultConfigFiles([$this->getConfigFile()]);
+        $this->beConstructedWith($logger, $this->getConfigFile());
+        // $this->setDefaultConfigFiles([$this->getConfigFile()]);
     }
     public function it_is_initializable()
     {
@@ -34,9 +35,9 @@ class ConfigManagerSpec extends ObjectBehavior
         $this->shouldThrow(\InvalidArgumentException::class)->during('getConfiguration', ['invalid']);
     }
 
-    public function it_throws_exception_if_invalid_configuration_file()
+    public function it_throws_exception_if_invalid_configuration_file($logger)
     {
-        $this->setDefaultConfigFiles([$this->getInvalidFile()]);
+        $this->beConstructedWith($logger, $this->getInvalidFile());
         $this->shouldThrow(\InvalidArgumentException::class)->during('getConfiguration', ['test']);
     }
 

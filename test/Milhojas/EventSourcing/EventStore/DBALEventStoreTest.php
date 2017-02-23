@@ -11,6 +11,7 @@ use Test\EventSourcing\Fixtures\EventDouble;
 use PHPUnit\Framework\TestCase;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\DriverManager;
+use Psr\Log\LoggerInterface;
 
 class DBALEventStoreTest extends TestCase
 {
@@ -46,7 +47,8 @@ class DBALEventStoreTest extends TestCase
      */
     private function getConfigurationData()
     {
-        $manager = new ConfigManager('config/database.yml');
+        $logger = $this->prophesize(LoggerInterface::class);
+        $manager = new ConfigManager($logger->reveal(), 'config/database.yml');
         $useConnect = getenv('ENV_EVENT_SOURCING');
         if (!$useConnect) {
             $useConnect = 'test';
