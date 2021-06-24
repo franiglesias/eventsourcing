@@ -13,6 +13,4 @@ if (!$useConnect) {
 
 $connection = DriverManager::getConnection($manager->getConfiguration($useConnect), new Configuration());
 
-// You can append new commands to $commands array, if needed
-
 return ConsoleRunner::createHelperSet($connection);

@@ -78,7 +78,7 @@ class SetUpCommand extends Command
     }
 
     /**
-     * Prepares the connectoin with database using the selected configuration.
+     * Prepares the connection with database using the selected configuration.
      *
      * @return \Doctrine\DBAL\Connection
      */
